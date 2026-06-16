@@ -1,0 +1,130 @@
+name: workflow reutilizable deploy Azure
+
+on:
+  workflow_call:
+    inputs:
+      azure_region:
+        required: true
+        type: string
+      bicep_file:
+        required: false
+        type: string
+        default: main.bicep
+      parameter_file:
+        required: false
+        type: string
+        default: ''
+      scopeLevel:
+        required: true
+        type: string
+      bicep_version:
+        required: false
+        type: string
+        default: 0.42.1 
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+   
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalacion de Bicep CLI
+        run:  az bicep install --version ${{ inputs.bicep_version }}
+
+      - name: Bicep lint
+        run: az bicep lint --file ${{ inputs.bicep_file }}
+
+  validate:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Bicep Validate
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: validate
+          name: validate-deployment
+          bicep-version: ${{ inputs.bicep_version }}
+          location: ${{ inputs.azure_region }}
+          scope: ${{ inputs.scopeLevel }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template-file: ${{ inputs.bicep_file }}
+          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+    
+  whatif:
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Bicep What-if
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: whatIf
+          name: whatif-deployment
+          bicep-version: ${{ inputs.bicep_version }}
+          location: ${{ inputs.azure_region }}
+          scope: ${{ inputs.scopeLevel }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template-file: ${{ inputs.bicep_file }}
+          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: whatif
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+          
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy a Azure
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: real-deployment
+          bicep-version: ${{ inputs.bicep_version }}
+          location: ${{ inputs.azure_region }}
+          scope: ${{ inputs.scopeLevel }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template-file: ${{ inputs.bicep_file }}
+          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
