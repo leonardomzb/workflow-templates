@@ -100,7 +100,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     #environment: Production
-    needs: whatif
+    needs: preview
     steps:
       - name: Checkout
         uses: actions/checkout@v4
