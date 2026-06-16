@@ -79,6 +79,9 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          action-on-unmanage-resources: delete
+          action-on-unmanage-resourcegroups: none #delete
+          deny-settings-mode: none
     
   whatif:
     runs-on: ubuntu-latest
