@@ -103,7 +103,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    environment: Production
+    #environment: Production
     needs: whatif
     steps:
       - name: Checkout
