@@ -17,10 +17,10 @@ on:
       scopeLevel:
         required: true
         type: string
-      bicep_version:
-        required: false
-        type: string
-        default: 0.42.1 
+      # bicep_version:
+      #   required: false
+      #   type: string
+      #   default: 0.42.1 
     secrets:
       AZURE_CLIENT_ID:
         required: true
@@ -41,8 +41,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Instalacion de Bicep CLI
-        run:  az bicep install --version ${{ inputs.bicep_version }}
+      # - name: Instalacion de Bicep CLI
+      #   run:  az bicep install --version ${{ inputs.bicep_version }}
 
       - name: Bicep lint
         run: az bicep lint --file ${{ inputs.bicep_file }}
@@ -67,7 +67,7 @@ jobs:
           type: deployment
           operation: validate
           name: validate-deployment
-          bicep-version: ${{ inputs.bicep_version }}
+          #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -94,7 +94,7 @@ jobs:
           type: deployment
           operation: whatIf
           name: whatif-deployment
-          bicep-version: ${{ inputs.bicep_version }}
+          #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -122,7 +122,7 @@ jobs:
           type: deployment
           operation: create
           name: real-deployment
-          bicep-version: ${{ inputs.bicep_version }}
+          #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
