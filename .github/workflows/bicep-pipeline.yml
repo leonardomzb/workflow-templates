@@ -6,6 +6,13 @@ on:
       azure_region:
         required: true
         type: string
+      scopeLevel:
+        required: true
+        type: string
+      resource_group:
+        required: false
+        type: string
+        default:  ''
       bicep_file:
         required: false
         type: string
@@ -14,9 +21,7 @@ on:
         required: false
         type: string
         default: ''
-      scopeLevel:
-        required: true
-        type: string
+      
       # bicep_version:
       #   required: false
       #   type: string
@@ -64,12 +69,13 @@ jobs:
       - name: Bicep Validate
         uses: azure/bicep-deploy@v2
         with:
-          type: deployment
+          type: deploymentStack
           operation: validate
           name: validate-deployment
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
+          resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
@@ -91,15 +97,19 @@ jobs:
       - name: Bicep What-if
         uses: azure/bicep-deploy@v2
         with:
-          type: deployment
+          type: deploymentStack
           operation: whatIf
-          name: whatif-deployment
+          name: whatif-deployment-stack
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
+          resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          action-on-unmanage-resources: delete
+          action-on-unmanage-resourcegroups: none #delete
+          deny-settings-mode: none
 
   deploy:
     runs-on: ubuntu-latest
@@ -119,12 +129,16 @@ jobs:
       - name: Deploy a Azure
         uses: azure/bicep-deploy@v2
         with:
-          type: deployment
+          type: deploymentStack
           operation: create
-          name: real-deployment
+          name: real-deployment-stack
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
+          resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          action-on-unmanage-resources: delete
+          action-on-unmanage-resourcegroups: none #delete
+          deny-settings-mode: none
