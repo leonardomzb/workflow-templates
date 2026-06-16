@@ -3,6 +3,9 @@ name: workflow reutilizable deploy Azure
 on:
   workflow_call:
     inputs:
+      deploy_name:
+        required: true
+        type: string
       azure_region:
         required: false
         type: string
@@ -72,7 +75,7 @@ jobs:
         with:
           type: deploymentStack
           operation: validate
-          name: validate-deployment
+          name: ${{ inputs.deploy_name }}
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
@@ -89,7 +92,7 @@ jobs:
         with:
           type: deployment
           operation: whatIf
-          name: whatif-deployment
+          name: ${{ inputs.deploy_name }}
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
@@ -118,7 +121,7 @@ jobs:
         with:
           type: deploymentStack
           operation: create
-          name: real-deployment-stack
+          name: ${{ inputs.deploy_name }}
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
