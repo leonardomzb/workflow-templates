@@ -4,8 +4,9 @@ on:
   workflow_call:
     inputs:
       azure_region:
-        required: true
+        required: false
         type: string
+        default: ''
       scopeLevel:
         required: true
         type: string
@@ -88,7 +89,7 @@ jobs:
         with:
           type: deployment
           operation: whatIf
-          name: whatif-deployment-stack
+          name: whatif-deployment
           #bicep-version: ${{ inputs.bicep_version }}
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
