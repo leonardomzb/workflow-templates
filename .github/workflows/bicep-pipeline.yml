@@ -80,7 +80,7 @@ jobs:
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
           action-on-unmanage-resources: delete
-          action-on-unmanage-resourcegroups: none #delete
+          action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
     
   whatif:
@@ -111,7 +111,7 @@ jobs:
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
           action-on-unmanage-resources: delete
-          action-on-unmanage-resourcegroups: none #delete
+          action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
 
   deploy:
@@ -143,5 +143,5 @@ jobs:
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
           action-on-unmanage-resources: delete
-          action-on-unmanage-resourcegroups: none #delete
+          action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
