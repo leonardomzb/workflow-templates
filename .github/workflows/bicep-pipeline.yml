@@ -62,6 +62,10 @@ jobs:
   preview:
     needs: lint
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write                
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,7 +89,7 @@ jobs:
           resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
-          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          parameters-file: ${{ inputs.parameter_file }}
           action-on-unmanage-resources: delete
           action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
@@ -102,7 +106,7 @@ jobs:
           resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
-          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          parameters-file: ${{ inputs.parameter_file }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -134,7 +138,7 @@ jobs:
           resource-group-name: ${{ inputs.resource_group }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
-          parameters-file: ${{ inputs.parameter_file != '' && inputs.parameter_file || '' }}
+          parameters-file: ${{ inputs.parameter_file }}
           action-on-unmanage-resources: delete
           action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
