@@ -13,6 +13,9 @@ on:
       scopeLevel:
         required: true
         type: string
+      environment:
+        required: false
+        type: string
       resource_group:
         required: false
         type: string
@@ -103,7 +106,10 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    #environment: Production
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write                
+      contents: read
     needs: preview
     steps:
       - name: Checkout
