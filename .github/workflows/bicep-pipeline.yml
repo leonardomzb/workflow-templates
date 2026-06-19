@@ -66,6 +66,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Debug Client
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          echo "Using READER"
+          else
+          echo "Using WRITER"
+          fi
 
       - name: Azure Login
         uses: azure/login@v2
