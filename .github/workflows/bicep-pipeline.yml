@@ -28,15 +28,6 @@ on:
         required: false
         type: string
         default: ''
-    secrets:
-      AZURE_CLIENT_ID_READER:
-        required: true      
-      AZURE_SUBSCRIPTION_ID:
-        required: true
-      AZURE_CLIENT_ID:
-        required: true    
-      AZURE_TENANT_ID:
-        required: true
 
 permissions:
   id-token: write
@@ -59,6 +50,7 @@ jobs:
   preview:
     needs: lint
     runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'push' && inputs.environment || '' }}
     permissions:
       id-token: write                
       contents: read
@@ -67,18 +59,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Debug Client
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-          echo "Using READER"
-          else
-          echo "Using WRITER"
-          fi
-
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ github.event_name == 'pull_request' && secrets.AZURE_CLIENT_ID_READER || secrets.AZURE_CLIENT_ID }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID_READER }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
