@@ -50,7 +50,6 @@ jobs:
   preview:
     needs: lint
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'push' && inputs.environment || '' }}
     permissions:
       id-token: write                
       contents: read
@@ -104,7 +103,6 @@ jobs:
       id-token: write                
       contents: read
     needs: preview
-    if: github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
