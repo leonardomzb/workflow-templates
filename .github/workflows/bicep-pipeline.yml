@@ -115,6 +115,7 @@ jobs:
       id-token: write                
       contents: read
     needs: preview
+    if: github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
