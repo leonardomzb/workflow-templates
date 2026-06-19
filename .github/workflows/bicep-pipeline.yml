@@ -34,11 +34,13 @@ on:
       #   type: string
       #   default: 0.42.1 
     secrets:
-      AZURE_CLIENT_ID:
-        required: true
+      AZURE_CLIENT_ID_READER:
+        required: true      
       AZURE_TENANT_ID:
         required: true
       AZURE_SUBSCRIPTION_ID:
+        required: true
+      AZURE_CLIENT_ID:
         required: true
 
 permissions:
@@ -62,10 +64,10 @@ jobs:
   preview:
     needs: lint
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     permissions:
       id-token: write                
       contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,9 +75,9 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ vars.AZURE_CLIENT_ID_READER }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       
       - name: Bicep Validate
         uses: azure/bicep-deploy@v2
@@ -87,7 +89,7 @@ jobs:
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           resource-group-name: ${{ inputs.resource_group }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file }}
           action-on-unmanage-resources: delete
@@ -104,7 +106,7 @@ jobs:
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           resource-group-name: ${{ inputs.resource_group }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file }}
 
@@ -124,8 +126,8 @@ jobs:
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy a Azure
         uses: azure/bicep-deploy@v2
@@ -137,7 +139,7 @@ jobs:
           location: ${{ inputs.azure_region }}
           scope: ${{ inputs.scopeLevel }}
           resource-group-name: ${{ inputs.resource_group }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           template-file: ${{ inputs.bicep_file }}
           parameters-file: ${{ inputs.parameter_file }}
           action-on-unmanage-resources: delete
