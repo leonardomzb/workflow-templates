@@ -1,3 +1,4 @@
+
 name: workflow reutilizable deploy Azure
 
 on:
@@ -58,6 +59,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Debug Client ID
+        run: |
+          echo "CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"
+
+      - name: Debug GitHub Context
+        run: |
+         echo "REPOSITORY=$GITHUB_REPOSITORY"
+          echo "REF=$GITHUB_REF"
+
       - name: Azure Login
         uses: azure/login@v2
         with:
