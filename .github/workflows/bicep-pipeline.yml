@@ -131,7 +131,7 @@ jobs:
       id-token: write                
       contents: read
     needs: whatif
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
