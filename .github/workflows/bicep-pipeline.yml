@@ -130,7 +130,7 @@ jobs:
     permissions:
       id-token: write                
       contents: read
-    needs: preview
+    needs: whatif
     if: github.event_name == 'push'
     steps:
       - name: Checkout
