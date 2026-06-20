@@ -14,7 +14,7 @@ on:
       scopeLevel:
         required: true
         type: string
-      environment:
+      environmentType:
         required: false
         type: string
       resource_group:
@@ -31,8 +31,6 @@ on:
         default: ''
     secrets:
       AZURE_CLIENT_ID:
-        required: true
-      AZURE_CLIENT_ID_READER:
         required: true
       AZURE_TENANT_ID:
         required: true
@@ -57,9 +55,10 @@ jobs:
       - name: Bicep lint
         run: az bicep lint --file ${{ inputs.bicep_file }}
 
-  preview:
+  validate:
     needs: lint
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environmentType }}
     permissions:
       id-token: write                
       contents: read
@@ -68,18 +67,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Debug
-        run: |
-          echo "CLIENT_ID=${#CLIENT_ID}"
-          echo "READER=${#READER}"
-        env:
-          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          READER: ${{ secrets.AZURE_CLIENT_ID_READER }}
-
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID_READER }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
@@ -99,6 +90,25 @@ jobs:
           action-on-unmanage-resources: delete
           action-on-unmanage-resourcegroups: detach #'delete' 'detach'
           deny-settings-mode: none
+ 
+  whatif:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environmentType }}
+    permissions:
+      id-token: write                
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
       - name: Bicep What-if
         uses: azure/bicep-deploy@v2
@@ -116,6 +126,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environmentType }}
     permissions:
       id-token: write                
       contents: read
