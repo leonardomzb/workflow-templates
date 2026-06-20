@@ -59,14 +59,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Debug Client ID
+      - name: Check client id length
+        env:
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         run: |
-          echo "CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"
-
-      - name: Debug GitHub Context
-        run: |
-         echo "REPOSITORY=$GITHUB_REPOSITORY"
-          echo "REF=$GITHUB_REF"
+          echo ${#CLIENT_ID}
 
       - name: Azure Login
         uses: azure/login@v2
