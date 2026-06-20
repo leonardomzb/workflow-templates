@@ -29,7 +29,16 @@ on:
         required: false
         type: string
         default: ''
-
+    secrets:
+       AZURE_CLIENT_ID:
+         required: true
+       AZURE_CLIENT_ID_READER:
+         required: true
+       AZURE_TENANT_ID:
+         required: true
+       AZURE_SUBSCRIPTION_ID:
+         required: true
+         
 permissions:
   id-token: write
   contents: read
@@ -59,11 +68,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Check client id length
+      - name: Debug
+        run: |
+          echo "CLIENT_ID=${#CLIENT_ID}"
+          echo "READER=${#READER}"
         env:
           CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        run: |
-          echo ${#CLIENT_ID}
+          READER: ${{ secrets.AZURE_CLIENT_ID_READER }}
 
       - name: Azure Login
         uses: azure/login@v2
